@@ -12,6 +12,10 @@ import (
 	"github.com/ketul1009/stockscreener-backend/db"
 )
 
+type apiConfig struct {
+	DB *db.Queries
+}
+
 func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Name string `json:"name"`
