@@ -38,7 +38,16 @@ func LoadConfig() (*Config, error) {
 	}
 
 	// Default allowed origins
-	allowedOrigins := []string{"https://*", "http://*"}
+	allowedOrigins := []string{
+		"http://localhost:5173",
+		"https://localhost:5173",
+		"http://127.0.0.1:5173",
+		"https://127.0.0.1:5173",
+		"http://localhost:*",
+		"https://localhost:*",
+		"http://127.0.0.1:*",
+		"https://127.0.0.1:*",
+	}
 	if origins := os.Getenv("ALLOWED_ORIGINS"); origins != "" {
 		allowedOrigins = []string{origins}
 	}

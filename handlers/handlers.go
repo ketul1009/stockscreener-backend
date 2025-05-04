@@ -9,19 +9,23 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/ketul1009/stockscreener-backend/db"
 	"github.com/ketul1009/stockscreener-backend/pkg/logger"
+	"github.com/ketul1009/stockscreener-backend/service"
 	"go.uber.org/zap"
 )
 
 type ApiConfig struct {
-	DB *db.Queries
+	DB          *db.Queries
+	AuthService *service.AuthService
 }
 
 type errorResponse struct {
-	Error string `json:"error"`
+	Error      string `json:"error"`
+	StatusCode int    `json:"status_code"`
 }
 
 type successResponse struct {
-	Data interface{} `json:"data"`
+	Data       interface{} `json:"data"`
+	StatusCode int         `json:"status_code"`
 }
 
 func ReadinessHandler(w http.ResponseWriter, r *http.Request) {
@@ -29,16 +33,20 @@ func ReadinessHandler(w http.ResponseWriter, r *http.Request) {
 		Data: map[string]string{
 			"status": "ok",
 		},
+		StatusCode: http.StatusOK,
 	})
 }
 
 func ErrHandler(w http.ResponseWriter, r *http.Request) {
-	respondWithError(w, http.StatusInternalServerError, "Internal Server Error")
+	respondWithError(w, http.StatusInternalServerError, "Internal Server Error", http.StatusInternalServerError)
 }
 
 func (cfg *ApiConfig) HandlerCreateUser(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Name string `json:"name"`
+		Name         string `json:"name"`
+		Username     string `json:"username"`
+		Email        string `json:"email"`
+		PasswordHash string `json:"password_hash"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -46,20 +54,22 @@ func (cfg *ApiConfig) HandlerCreateUser(w http.ResponseWriter, r *http.Request) 
 	err := decoder.Decode(&params)
 	if err != nil {
 		logger.Error("Failed to decode request body", zap.Error(err))
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
 
 	now := time.Now()
 	user, err := cfg.DB.CreateUser(r.Context(), db.CreateUserParams{
-		ID:        pgtype.UUID{Bytes: uuid.New(), Valid: true},
-		CreatedAt: pgtype.Timestamp{Time: now, Valid: true},
-		UpdatedAt: pgtype.Timestamp{Time: now, Valid: true},
-		Name:      params.Name,
+		ID:           pgtype.UUID{Bytes: uuid.New(), Valid: true},
+		CreatedAt:    pgtype.Timestamp{Time: now, Valid: true},
+		UpdatedAt:    pgtype.Timestamp{Time: now, Valid: true},
+		Username:     params.Username,
+		Email:        params.Email,
+		PasswordHash: params.PasswordHash,
 	})
 	if err != nil {
 		logger.Error("Failed to create user", zap.Error(err))
-		respondWithError(w, http.StatusInternalServerError, "Failed to create user")
+		respondWithError(w, http.StatusInternalServerError, "Failed to create user", http.StatusInternalServerError)
 		return
 	}
 
@@ -72,7 +82,7 @@ func (cfg *ApiConfig) HandlerGetUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := cfg.DB.GetUsers(r.Context())
 	if err != nil {
 		logger.Error("Failed to fetch users", zap.Error(err))
-		respondWithError(w, http.StatusInternalServerError, "Failed to fetch users")
+		respondWithError(w, http.StatusInternalServerError, "Failed to fetch users", http.StatusInternalServerError)
 		return
 	}
 
@@ -81,8 +91,8 @@ func (cfg *ApiConfig) HandlerGetUsers(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func respondWithError(w http.ResponseWriter, code int, message string) {
-	respondWithJSON(w, code, errorResponse{Error: message})
+func respondWithError(w http.ResponseWriter, code int, message string, statusCode int) {
+	respondWithJSON(w, code, errorResponse{Error: message, StatusCode: statusCode})
 }
 
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
@@ -96,4 +106,14 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(response)
+}
+
+func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
+	authHandler := AuthHandler{AuthService: cfg.AuthService}
+	authHandler.HandlerLogin(w, r)
+}
+
+func (cfg *ApiConfig) HandlerRegister(w http.ResponseWriter, r *http.Request) {
+	authHandler := AuthHandler{AuthService: cfg.AuthService}
+	authHandler.HandlerRegister(w, r)
 }
