@@ -18,6 +18,8 @@ import (
 	"github.com/ketul1009/stockscreener-backend/handlers"
 	"github.com/ketul1009/stockscreener-backend/middleware"
 	"github.com/ketul1009/stockscreener-backend/pkg/logger"
+	"github.com/ketul1009/stockscreener-backend/routes"
+	"github.com/ketul1009/stockscreener-backend/service"
 	"go.uber.org/zap"
 
 	_ "github.com/lib/pq"
@@ -47,10 +49,11 @@ func main() {
 
 	// Initialize API config
 	apiConfig := handlers.ApiConfig{
-		DB: db.New(conn),
+		DB:          db.New(conn),
+		AuthService: &service.AuthService{DB: db.New(conn)},
 	}
 
-	// Initialize router
+	// Create base router
 	router := chi.NewRouter()
 
 	// Add middleware
@@ -58,21 +61,16 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   cfg.AllowedOrigins,
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"*"},
-		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: false,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Origin", "X-Requested-With", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers"},
+		ExposedHeaders:   []string{"Link", "Content-Type", "Authorization", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers"},
+		AllowCredentials: true,
 		MaxAge:           300,
+		Debug:            true,
 	}))
 
 	// Initialize routes
-	v1Router := chi.NewRouter()
-	v1Router.Get("/healthz", handlers.ReadinessHandler)
-	v1Router.Get("/err", handlers.ErrHandler)
-	v1Router.Post("/users", apiConfig.HandlerCreateUser)
-	v1Router.Get("/users", apiConfig.HandlerGetUsers)
-
-	router.Mount("/v1", v1Router)
+	router.Mount("/v1", routes.InitRoutes(apiConfig))
 
 	// Create server
 	srv := &http.Server{
