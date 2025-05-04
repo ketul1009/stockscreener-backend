@@ -1,3 +1,4 @@
 stockscreener-backend.exe
 .env
 vendor/
+sqlc.zip
