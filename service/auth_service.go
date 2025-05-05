@@ -58,27 +58,27 @@ func (s *AuthService) Login(ctx context.Context, email string, password string) 
 	}, nil
 }
 
-func (s *AuthService) Register(ctx context.Context, username string, email string, password string) (string, error) {
+func (s *AuthService) Register(ctx context.Context, username string, email string, password string) (string, int, error) {
 	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
-		return "", err
+		return "", 500, err
 	}
 
 	usernameExists, err := s.CheckUsernameExists(ctx, username)
 	if err != nil {
-		return "", err
+		return "", 500, err
 	}
 	emailExists, err := s.CheckEmailExists(ctx, email)
 	if err != nil {
-		return "", err
+		return "", 500, err
 	}
 
 	if usernameExists {
-		return "", errors.New("username already exists")
+		return "", 403, errors.New("username already exists")
 	}
 
 	if emailExists {
-		return "", errors.New("email already exists")
+		return "", 403, errors.New("email already exists")
 	}
 
 	user, err := s.DB.CreateUser(ctx, db.CreateUserParams{
@@ -91,10 +91,15 @@ func (s *AuthService) Register(ctx context.Context, username string, email strin
 	})
 
 	if err != nil {
-		return "", err
+		return "", 500, err
 	}
 
-	return utils.GenerateJWT(user.Username)
+	token, err := utils.GenerateJWT(user.Username)
+	if err != nil {
+		return "", 500, err
+	}
+
+	return token, 200, nil
 }
 
 func (s *AuthService) CheckUsernameExists(ctx context.Context, username string) (bool, error) {
