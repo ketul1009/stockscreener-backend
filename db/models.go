@@ -8,6 +8,13 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Screener struct {
+	ID       int32  `json:"id"`
+	Name     string `json:"name"`
+	Rules    []byte `json:"rules"`
+	Username string `json:"username"`
+}
+
 type User struct {
 	ID           pgtype.UUID      `json:"id"`
 	CreatedAt    pgtype.Timestamp `json:"created_at"`

@@ -49,8 +49,9 @@ func main() {
 
 	// Initialize API config
 	apiConfig := handlers.ApiConfig{
-		DB:          db.New(conn),
-		AuthService: &service.AuthService{DB: db.New(conn)},
+		DB:              db.New(conn),
+		AuthService:     &service.AuthService{DB: db.New(conn)},
+		ScreenerService: &service.ScreenerService{DB: db.New(conn)},
 	}
 
 	// Create base router
