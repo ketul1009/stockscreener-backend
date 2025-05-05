@@ -20,5 +20,8 @@ func InitRoutes(apiConfig handlers.ApiConfig) *chi.Mux {
 	v1Router.Post("/login", apiConfig.HandlerLogin)
 	v1Router.Post("/register", apiConfig.HandlerRegister)
 
+	// Screener routes
+	v1Router.Post("/screeners", apiConfig.HandlerCreateScreener)
+
 	return v1Router
 }

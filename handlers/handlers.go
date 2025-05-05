@@ -14,8 +14,9 @@ import (
 )
 
 type ApiConfig struct {
-	DB          *db.Queries
-	AuthService *service.AuthService
+	DB              *db.Queries
+	AuthService     *service.AuthService
+	ScreenerService *service.ScreenerService
 }
 
 type errorResponse struct {
@@ -116,4 +117,9 @@ func (cfg *ApiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 func (cfg *ApiConfig) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 	authHandler := AuthHandler{AuthService: cfg.AuthService}
 	authHandler.HandlerRegister(w, r)
+}
+
+func (cfg *ApiConfig) HandlerCreateScreener(w http.ResponseWriter, r *http.Request) {
+	screenerHandler := ScreenerHandler{ScreenerService: cfg.ScreenerService}
+	screenerHandler.CreateScreener(w, r)
 }

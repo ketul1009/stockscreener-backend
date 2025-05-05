@@ -9,7 +9,9 @@ import (
 )
 
 type Querier interface {
+	CreateScreener(ctx context.Context, arg CreateScreenerParams) (Screener, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	GetScreener(ctx context.Context, id int32) (Screener, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUsers(ctx context.Context) ([]User, error)

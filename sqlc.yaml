@@ -1,8 +1,8 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "sql/queries"
-    schema: "sql/schema"
+    queries: "sql/queries/**/*.sql"  # Use glob pattern to find all SQL files
+    schema: "sql/schema/*.sql"       # Use glob pattern for schema files
     gen:
       go:
         package: "db"
