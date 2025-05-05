@@ -46,12 +46,12 @@ func (h *AuthHandler) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := h.AuthService.Register(r.Context(), registerRequest.Username, registerRequest.Email, registerRequest.Password)
+	token, code, err := h.AuthService.Register(r.Context(), registerRequest.Username, registerRequest.Email, registerRequest.Password)
 	if err != nil {
 		logger.Error("Failed to register", zap.Error(err))
-		respondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		respondWithJSON(w, code, map[string]string{"error": err.Error()})
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, map[string]string{"token": token})
+	respondWithJSON(w, code, map[string]string{"token": token})
 }
