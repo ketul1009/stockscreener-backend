@@ -24,21 +24,14 @@ func (h *AuthHandler) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := h.AuthService.Login(r.Context(), loginRequest.Email, loginRequest.Password)
+	response, err := h.AuthService.Login(r.Context(), loginRequest.Email, loginRequest.Password)
 	if err != nil {
 		logger.Error("Failed to login", zap.Error(err))
-		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		respondWithJSON(w, http.StatusUnauthorized, map[string]string{"error": "Invalid credentials"})
 		return
 	}
 
-	response := struct {
-		Token string `json:"token"`
-	}{
-		Token: token,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	respondWithJSON(w, http.StatusOK, response)
 }
 
 func (h *AuthHandler) HandlerRegister(w http.ResponseWriter, r *http.Request) {
@@ -55,9 +48,10 @@ func (h *AuthHandler) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 
 	token, err := h.AuthService.Register(r.Context(), registerRequest.Username, registerRequest.Email, registerRequest.Password)
 	if err != nil {
-		http.Error(w, "Failed to register", http.StatusInternalServerError)
+		logger.Error("Failed to register", zap.Error(err))
+		respondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		return
 	}
 
-	json.NewEncoder(w).Encode(successResponse{Data: map[string]string{"token": token}})
+	respondWithJSON(w, http.StatusOK, map[string]string{"token": token})
 }
