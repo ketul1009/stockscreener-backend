@@ -13,10 +13,11 @@ type ScreenerService struct {
 }
 
 type Screener struct {
-	ID       int64                    `json:"id"`
-	Name     string                   `json:"name"`
-	Username string                   `json:"username"`
-	Rules    []map[string]interface{} `json:"rules"`
+	ID            int64                    `json:"id"`
+	Name          string                   `json:"name"`
+	StockUniverse string                   `json:"stock_universe"`
+	Username      string                   `json:"username"`
+	Rules         []map[string]interface{} `json:"rules"`
 }
 
 func (s *ScreenerService) CreateScreener(ctx context.Context, screener *Screener) (*Screener, error) {
@@ -84,9 +85,10 @@ func (s *ScreenerService) GetScreener(ctx context.Context, id int64) (*Screener,
 	}
 
 	return &Screener{
-		ID:       int64(screener.ID),
-		Username: screener.Username,
-		Name:     screener.Name,
-		Rules:    rules,
+		ID:            int64(screener.ID),
+		Username:      screener.Username,
+		StockUniverse: screener.StockUniverse,
+		Name:          screener.Name,
+		Rules:         rules,
 	}, nil
 }
