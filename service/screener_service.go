@@ -71,3 +71,22 @@ func (s *ScreenerService) GetScreeners(ctx context.Context, username string) ([]
 
 	return screenerList, nil
 }
+
+func (s *ScreenerService) GetScreener(ctx context.Context, id int64) (*Screener, error) {
+	screener, err := s.DB.GetScreener(ctx, int32(id))
+	if err != nil {
+		return nil, err
+	}
+
+	var rules []map[string]interface{}
+	if err := json.Unmarshal(screener.Rules, &rules); err != nil {
+		return nil, err
+	}
+
+	return &Screener{
+		ID:       int64(screener.ID),
+		Username: screener.Username,
+		Name:     screener.Name,
+		Rules:    rules,
+	}, nil
+}

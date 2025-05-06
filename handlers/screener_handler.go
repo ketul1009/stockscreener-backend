@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/ketul1009/stockscreener-backend/service"
 )
@@ -36,15 +37,37 @@ func (h *ScreenerHandler) CreateScreener(w http.ResponseWriter, r *http.Request)
 
 func (h *ScreenerHandler) GetScreeners(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
-	if username == "" {
-		respondWithError(w, http.StatusBadRequest, "Username is required", 400)
+	id := r.URL.Query().Get("id")
+	if username == "" && id == "" {
+		respondWithError(w, http.StatusBadRequest, "Username or ID is required", 400)
 		return
 	}
 
-	screeners, err := h.ScreenerService.GetScreeners(r.Context(), username)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Failed to get screeners", 500)
+	if username != "" {
+		screeners, err := h.ScreenerService.GetScreeners(r.Context(), username)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "Failed to get screeners", 500)
+			return
+		}
+		respondWithJSON(w, http.StatusOK, screeners)
 		return
 	}
-	respondWithJSON(w, http.StatusOK, screeners)
+
+	idInt, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid ID format", 400)
+		return
+	}
+
+	if id != "" {
+		screener, err := h.ScreenerService.GetScreener(r.Context(), idInt)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "Failed to get screener", 500)
+			return
+		}
+		respondWithJSON(w, http.StatusOK, screener)
+		return
+	}
+
+	respondWithError(w, http.StatusBadRequest, "Invalid request", 400)
 }
