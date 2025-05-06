@@ -11,7 +11,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 	"github.com/ketul1009/stockscreener-backend/config"
 	"github.com/ketul1009/stockscreener-backend/db"
@@ -24,6 +24,34 @@ import (
 
 	_ "github.com/lib/pq"
 )
+
+func createDBPool(ctx context.Context, dbURL string) (*pgxpool.Pool, error) {
+	config, err := pgxpool.ParseConfig(dbURL)
+	if err != nil {
+		return nil, err
+	}
+
+	// Configure the connection pool
+	config.MaxConns = 25 // Maximum number of connections in the pool
+	config.MinConns = 5  // Minimum number of connections to maintain
+	config.MaxConnLifetime = time.Hour
+	config.MaxConnIdleTime = 30 * time.Minute
+	config.HealthCheckPeriod = time.Minute
+
+	// Create the connection pool
+	pool, err := pgxpool.NewWithConfig(ctx, config)
+	if err != nil {
+		return nil, err
+	}
+
+	// Test the connection
+	if err := pool.Ping(ctx); err != nil {
+		pool.Close()
+		return nil, err
+	}
+
+	return pool, nil
+}
 
 func main() {
 	// Load environment variables
@@ -40,18 +68,22 @@ func main() {
 		logger.Fatal("Failed to load config", zap.Error(err))
 	}
 
-	// Initialize database connection
-	conn, err := pgx.Connect(context.Background(), cfg.DBURL)
+	// Initialize database connection pool
+	ctx := context.Background()
+	pool, err := createDBPool(ctx, cfg.DBURL)
 	if err != nil {
-		logger.Fatal("Failed to connect to database", zap.Error(err))
+		logger.Fatal("Failed to create database pool", zap.Error(err))
 	}
-	defer conn.Close(context.Background())
+	defer pool.Close()
+
+	// Create a single DB instance to be shared
+	dbInstance := db.WithPool(pool)
 
 	// Initialize API config
 	apiConfig := handlers.ApiConfig{
-		DB:              db.New(conn),
-		AuthService:     &service.AuthService{DB: db.New(conn)},
-		ScreenerService: &service.ScreenerService{DB: db.New(conn)},
+		DB:              dbInstance,
+		AuthService:     &service.AuthService{DB: dbInstance},
+		ScreenerService: &service.ScreenerService{DB: dbInstance},
 	}
 
 	// Create base router

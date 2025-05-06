@@ -9,10 +9,11 @@ import (
 )
 
 type Screener struct {
-	ID       int32  `json:"id"`
-	Name     string `json:"name"`
-	Rules    []byte `json:"rules"`
-	Username string `json:"username"`
+	ID            int32  `json:"id"`
+	Name          string `json:"name"`
+	Rules         []byte `json:"rules"`
+	Username      string `json:"username"`
+	StockUniverse string `json:"stock_universe"`
 }
 
 type User struct {

@@ -12,7 +12,7 @@ import (
 const createScreener = `-- name: CreateScreener :one
 INSERT INTO screeners (username, name, rules)
 VALUES ($1, $2, $3)
-RETURNING id, name, rules, username
+RETURNING id, name, rules, username, stock_universe
 `
 
 type CreateScreenerParams struct {
@@ -29,12 +29,13 @@ func (q *Queries) CreateScreener(ctx context.Context, arg CreateScreenerParams) 
 		&i.Name,
 		&i.Rules,
 		&i.Username,
+		&i.StockUniverse,
 	)
 	return i, err
 }
 
 const getScreener = `-- name: GetScreener :one
-SELECT id, name, rules, username FROM screeners
+SELECT id, name, rules, username, stock_universe FROM screeners
 WHERE id = $1
 `
 
@@ -46,6 +47,38 @@ func (q *Queries) GetScreener(ctx context.Context, id int32) (Screener, error) {
 		&i.Name,
 		&i.Rules,
 		&i.Username,
+		&i.StockUniverse,
 	)
 	return i, err
+}
+
+const getScreeners = `-- name: GetScreeners :many
+SELECT id, name, rules, username, stock_universe FROM screeners
+WHERE username = $1
+`
+
+func (q *Queries) GetScreeners(ctx context.Context, username string) ([]Screener, error) {
+	rows, err := q.db.Query(ctx, getScreeners, username)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Screener{}
+	for rows.Next() {
+		var i Screener
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Rules,
+			&i.Username,
+			&i.StockUniverse,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

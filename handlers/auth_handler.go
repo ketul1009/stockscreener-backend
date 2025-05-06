@@ -55,3 +55,27 @@ func (h *AuthHandler) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 
 	respondWithJSON(w, code, map[string]string{"token": token})
 }
+
+func (h *AuthHandler) HandlerGetUserFromToken(w http.ResponseWriter, r *http.Request) {
+	// Get token from Authorization header
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		respondWithJSON(w, http.StatusUnauthorized, map[string]string{"error": "missing authorization header"})
+		return
+	}
+
+	// Extract token from "Bearer <token>"
+	token := authHeader
+	if len(authHeader) > 7 && authHeader[:7] == "Bearer " {
+		token = authHeader[7:]
+	}
+
+	user, err := h.AuthService.GetUserFromToken(r.Context(), token)
+	if err != nil {
+		logger.Error("Failed to get user from token", zap.Error(err))
+		respondWithJSON(w, http.StatusUnauthorized, map[string]string{"error": err.Error()})
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, user)
+}
