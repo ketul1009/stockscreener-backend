@@ -13,10 +13,10 @@ type ScreenerService struct {
 }
 
 type Screener struct {
-	ID       int64
-	Name     string
-	Username string
-	Rules    []map[string]interface{}
+	ID       int64                    `json:"id"`
+	Name     string                   `json:"name"`
+	Username string                   `json:"username"`
+	Rules    []map[string]interface{} `json:"rules"`
 }
 
 func (s *ScreenerService) CreateScreener(ctx context.Context, screener *Screener) (*Screener, error) {
@@ -46,4 +46,28 @@ func (s *ScreenerService) CreateScreener(ctx context.Context, screener *Screener
 		Name:     dbScreener.Name,
 		Rules:    rules,
 	}, nil
+}
+
+func (s *ScreenerService) GetScreeners(ctx context.Context, username string) ([]Screener, error) {
+	screeners, err := s.DB.GetScreeners(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+
+	var screenerList []Screener
+	for _, screener := range screeners {
+		var rules []map[string]interface{}
+		if err := json.Unmarshal(screener.Rules, &rules); err != nil {
+			return nil, err
+		}
+
+		screenerList = append(screenerList, Screener{
+			ID:       int64(screener.ID),
+			Username: screener.Username,
+			Name:     screener.Name,
+			Rules:    rules,
+		})
+	}
+
+	return screenerList, nil
 }

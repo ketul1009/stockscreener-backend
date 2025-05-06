@@ -119,3 +119,23 @@ func (s *AuthService) CheckEmailExists(ctx context.Context, email string) (bool,
 
 	return true, nil
 }
+
+func (s *AuthService) GetUserFromToken(ctx context.Context, token string) (*UserResponse, error) {
+	claims, err := utils.ValidateJWT(token)
+	if err != nil {
+		return nil, errors.New("invalid token")
+	}
+
+	user, err := s.DB.GetUserByUsername(ctx, claims.Subject)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	return &UserResponse{
+		ID:        user.ID,
+		Username:  user.Username,
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}, nil
+}

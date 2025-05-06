@@ -7,6 +7,8 @@ RETURNING *;
 SELECT * FROM screeners
 WHERE id = $1;
 
-
+-- name: GetScreeners :many
+SELECT * FROM screeners
+WHERE username = $1;
 
 

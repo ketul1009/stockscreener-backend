@@ -22,13 +22,29 @@ func (h *ScreenerHandler) CreateScreener(w http.ResponseWriter, r *http.Request)
 
 	createdScreener, err := h.ScreenerService.CreateScreener(r.Context(), &screener)
 	if err != nil {
-		http.Error(w, "Failed to create screener", http.StatusInternalServerError)
+		fmt.Println(err.Error())
+		if err.Error() == "ERROR: duplicate key value violates unique constraint \"unique_name_user_id\" (SQLSTATE 23505)" {
+			respondWithJSON(w, http.StatusConflict, map[string]string{"error": "Screener with this name already exists"})
+			return
+		}
+		respondWithError(w, http.StatusInternalServerError, "Failed to create screener", 500)
 		return
 	}
 
 	respondWithJSON(w, http.StatusCreated, createdScreener)
 }
 
-func (h *ScreenerHandler) GetScreener(w http.ResponseWriter, r *http.Request) {
+func (h *ScreenerHandler) GetScreeners(w http.ResponseWriter, r *http.Request) {
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		respondWithError(w, http.StatusBadRequest, "Username is required", 400)
+		return
+	}
 
+	screeners, err := h.ScreenerService.GetScreeners(r.Context(), username)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Failed to get screeners", 500)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, screeners)
 }
