@@ -82,3 +82,35 @@ func (q *Queries) GetScreeners(ctx context.Context, username string) ([]Screener
 	}
 	return items, nil
 }
+
+const updateScreener = `-- name: UpdateScreener :one
+UPDATE screeners
+SET name = $2, rules = $3, stock_universe = $4
+WHERE id = $1
+RETURNING id, name, rules, username, stock_universe
+`
+
+type UpdateScreenerParams struct {
+	ID            int32  `json:"id"`
+	Name          string `json:"name"`
+	Rules         []byte `json:"rules"`
+	StockUniverse string `json:"stock_universe"`
+}
+
+func (q *Queries) UpdateScreener(ctx context.Context, arg UpdateScreenerParams) (Screener, error) {
+	row := q.db.QueryRow(ctx, updateScreener,
+		arg.ID,
+		arg.Name,
+		arg.Rules,
+		arg.StockUniverse,
+	)
+	var i Screener
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Rules,
+		&i.Username,
+		&i.StockUniverse,
+	)
+	return i, err
+}

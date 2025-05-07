@@ -129,6 +129,11 @@ func (cfg *ApiConfig) HandlerGetScreeners(w http.ResponseWriter, r *http.Request
 	screenerHandler.GetScreeners(w, r)
 }
 
+func (cfg *ApiConfig) HandlerUpdateScreener(w http.ResponseWriter, r *http.Request) {
+	screenerHandler := ScreenerHandler{ScreenerService: cfg.ScreenerService}
+	screenerHandler.UpdateScreener(w, r)
+}
+
 func (cfg *ApiConfig) HandlerGetUserFromToken(w http.ResponseWriter, r *http.Request) {
 	authHandler := AuthHandler{AuthService: cfg.AuthService}
 	authHandler.HandlerGetUserFromToken(w, r)
