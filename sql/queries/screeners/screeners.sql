@@ -17,3 +17,7 @@ SET name = $2, rules = $3, stock_universe = $4
 WHERE id = $1
 RETURNING *;
 
+-- name: DeleteScreener :exec
+DELETE FROM screeners
+WHERE id = $1;
+
