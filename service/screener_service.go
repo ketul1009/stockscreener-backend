@@ -122,3 +122,13 @@ func (s *ScreenerService) UpdateScreener(ctx context.Context, id int64, screener
 		Rules:         rules,
 	}, nil
 }
+
+func (s *ScreenerService) DeleteScreener(ctx context.Context, id int64) error {
+
+	err := s.DB.DeleteScreener(ctx, int32(id))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

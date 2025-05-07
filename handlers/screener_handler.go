@@ -90,3 +90,31 @@ func (h *ScreenerHandler) UpdateScreener(w http.ResponseWriter, r *http.Request)
 
 	respondWithJSON(w, http.StatusOK, updatedScreener)
 }
+
+func (h *ScreenerHandler) DeleteScreener(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	if id == "" {
+		respondWithError(w, http.StatusBadRequest, "ID is required", 400)
+		return
+	}
+
+	idInt, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid ID format", 400)
+		return
+	}
+
+	_, err = h.ScreenerService.GetScreener(r.Context(), idInt)
+	if err != nil {
+		respondWithError(w, http.StatusNotFound, "Screener not found", 404)
+		return
+	}
+
+	err = h.ScreenerService.DeleteScreener(r.Context(), idInt)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Failed to delete screener", 500)
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"message": "Screener deleted successfully"})
+}

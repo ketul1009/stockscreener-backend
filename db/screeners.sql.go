@@ -34,6 +34,16 @@ func (q *Queries) CreateScreener(ctx context.Context, arg CreateScreenerParams) 
 	return i, err
 }
 
+const deleteScreener = `-- name: DeleteScreener :exec
+DELETE FROM screeners
+WHERE id = $1
+`
+
+func (q *Queries) DeleteScreener(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deleteScreener, id)
+	return err
+}
+
 const getScreener = `-- name: GetScreener :one
 SELECT id, name, rules, username, stock_universe FROM screeners
 WHERE id = $1

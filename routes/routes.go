@@ -25,6 +25,7 @@ func InitRoutes(apiConfig handlers.ApiConfig) *chi.Mux {
 	v1Router.Post("/screeners", apiConfig.HandlerCreateScreener)
 	v1Router.Get("/screeners", apiConfig.HandlerGetScreeners)
 	v1Router.Put("/screeners/{id}", apiConfig.HandlerUpdateScreener)
+	v1Router.Delete("/screeners", apiConfig.HandlerDeleteScreener)
 
 	return v1Router
 }
