@@ -11,4 +11,9 @@ WHERE id = $1;
 SELECT * FROM screeners
 WHERE username = $1;
 
+-- name: UpdateScreener :one
+UPDATE screeners
+SET name = $2, rules = $3, stock_universe = $4
+WHERE id = $1
+RETURNING *;
 

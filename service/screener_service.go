@@ -92,3 +92,33 @@ func (s *ScreenerService) GetScreener(ctx context.Context, id int64) (*Screener,
 		Rules:         rules,
 	}, nil
 }
+
+func (s *ScreenerService) UpdateScreener(ctx context.Context, id int64, screener *Screener) (*Screener, error) {
+	rulesJSON, err := json.Marshal(screener.Rules)
+	if err != nil {
+		return nil, err
+	}
+
+	dbScreener, err := s.DB.UpdateScreener(ctx, db.UpdateScreenerParams{
+		ID:            int32(id),
+		Name:          screener.Name,
+		Rules:         rulesJSON,
+		StockUniverse: screener.StockUniverse,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var rules []map[string]interface{}
+	if err := json.Unmarshal(dbScreener.Rules, &rules); err != nil {
+		return nil, err
+	}
+
+	return &Screener{
+		ID:            int64(dbScreener.ID),
+		Username:      dbScreener.Username,
+		StockUniverse: dbScreener.StockUniverse,
+		Name:          dbScreener.Name,
+		Rules:         rules,
+	}, nil
+}

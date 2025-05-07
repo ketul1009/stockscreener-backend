@@ -71,3 +71,22 @@ func (h *ScreenerHandler) GetScreeners(w http.ResponseWriter, r *http.Request) {
 
 	respondWithError(w, http.StatusBadRequest, "Invalid request", 400)
 }
+
+func (h *ScreenerHandler) UpdateScreener(w http.ResponseWriter, r *http.Request) {
+	var screener service.Screener
+	err := json.NewDecoder(r.Body).Decode(&screener)
+	if err != nil {
+		fmt.Println(err.Error())
+		respondWithError(w, http.StatusBadRequest, "Invalid request body", 400)
+		return
+	}
+
+	updatedScreener, err := h.ScreenerService.UpdateScreener(r.Context(), screener.ID, &screener)
+	if err != nil {
+		fmt.Println(err.Error())
+		respondWithError(w, http.StatusInternalServerError, "Failed to update screener", 500)
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, updatedScreener)
+}
