@@ -143,3 +143,8 @@ func (cfg *ApiConfig) HandlerGetUserFromToken(w http.ResponseWriter, r *http.Req
 	authHandler := AuthHandler{AuthService: cfg.AuthService}
 	authHandler.HandlerGetUserFromToken(w, r)
 }
+
+func (cfg *ApiConfig) HandlerUpdateUser(w http.ResponseWriter, r *http.Request) {
+	authHandler := AuthHandler{AuthService: cfg.AuthService}
+	authHandler.HandlerUpdateUser(w, r)
+}

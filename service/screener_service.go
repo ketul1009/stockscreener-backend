@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/ketul1009/stockscreener-backend/db"
 )
 
@@ -16,7 +18,7 @@ type Screener struct {
 	ID            int64                    `json:"id"`
 	Name          string                   `json:"name"`
 	StockUniverse string                   `json:"stock_universe"`
-	Username      string                   `json:"username"`
+	UserID        string                   `json:"user_id"`
 	Rules         []map[string]interface{} `json:"rules"`
 }
 
@@ -27,9 +29,9 @@ func (s *ScreenerService) CreateScreener(ctx context.Context, screener *Screener
 	}
 
 	dbScreener, err := s.DB.CreateScreener(ctx, db.CreateScreenerParams{
-		Username: screener.Username,
-		Name:     screener.Name,
-		Rules:    rulesJSON,
+		UserID: pgtype.UUID{Bytes: uuid.MustParse(screener.UserID), Valid: true},
+		Name:   screener.Name,
+		Rules:  rulesJSON,
 	})
 	if err != nil {
 		fmt.Println(err.Error())
@@ -42,15 +44,15 @@ func (s *ScreenerService) CreateScreener(ctx context.Context, screener *Screener
 	}
 
 	return &Screener{
-		ID:       int64(dbScreener.ID),
-		Username: dbScreener.Username,
-		Name:     dbScreener.Name,
-		Rules:    rules,
+		ID:     int64(dbScreener.ID),
+		UserID: dbScreener.UserID.String(),
+		Name:   dbScreener.Name,
+		Rules:  rules,
 	}, nil
 }
 
 func (s *ScreenerService) GetScreeners(ctx context.Context, username string) ([]Screener, error) {
-	screeners, err := s.DB.GetScreeners(ctx, username)
+	screeners, err := s.DB.GetScreeners(ctx, pgtype.UUID{Bytes: uuid.MustParse(username), Valid: true})
 	if err != nil {
 		return nil, err
 	}
@@ -63,10 +65,10 @@ func (s *ScreenerService) GetScreeners(ctx context.Context, username string) ([]
 		}
 
 		screenerList = append(screenerList, Screener{
-			ID:       int64(screener.ID),
-			Username: screener.Username,
-			Name:     screener.Name,
-			Rules:    rules,
+			ID:     int64(screener.ID),
+			UserID: screener.UserID.String(),
+			Name:   screener.Name,
+			Rules:  rules,
 		})
 	}
 
@@ -86,7 +88,7 @@ func (s *ScreenerService) GetScreener(ctx context.Context, id int64) (*Screener,
 
 	return &Screener{
 		ID:            int64(screener.ID),
-		Username:      screener.Username,
+		UserID:        screener.UserID.String(),
 		StockUniverse: screener.StockUniverse,
 		Name:          screener.Name,
 		Rules:         rules,
@@ -116,7 +118,7 @@ func (s *ScreenerService) UpdateScreener(ctx context.Context, id int64, screener
 
 	return &Screener{
 		ID:            int64(dbScreener.ID),
-		Username:      dbScreener.Username,
+		UserID:        dbScreener.UserID.String(),
 		StockUniverse: dbScreener.StockUniverse,
 		Name:          dbScreener.Name,
 		Rules:         rules,

@@ -139,3 +139,58 @@ func (s *AuthService) GetUserFromToken(ctx context.Context, token string) (*User
 		UpdatedAt: user.UpdatedAt,
 	}, nil
 }
+
+func (s *AuthService) UpdateUser(ctx context.Context, id string, username string, email string) (*LoginResponse, error) {
+	existingUser, err := s.DB.GetUserByID(ctx, pgtype.UUID{Bytes: uuid.MustParse(id), Valid: true})
+	if err != nil {
+		return nil, err
+	}
+
+	if existingUser.ID.Bytes != uuid.MustParse(id) {
+		return nil, errors.New("user not found")
+	}
+
+	usernameExists, err := s.CheckUsernameExists(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+	emailExists, err := s.CheckEmailExists(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	if usernameExists && existingUser.Username != username {
+		return nil, errors.New("username already exists")
+	}
+
+	if emailExists && existingUser.Email != email {
+		return nil, errors.New("email already exists")
+	}
+
+	user, err := s.DB.UpdateUser(ctx, db.UpdateUserParams{
+		ID:        existingUser.ID,
+		Username:  username,
+		Email:     email,
+		UpdatedAt: pgtype.Timestamp{Time: time.Now(), Valid: true},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	token, err := utils.GenerateJWT(user.Username)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LoginResponse{
+		User: UserResponse{
+			ID:        user.ID,
+			Username:  user.Username,
+			Email:     user.Email,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+		},
+		Token: token,
+	}, nil
+}
