@@ -6,6 +6,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Querier interface {
@@ -13,11 +15,13 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteScreener(ctx context.Context, id int32) error
 	GetScreener(ctx context.Context, id int32) (Screener, error)
-	GetScreeners(ctx context.Context, username string) ([]Screener, error)
+	GetScreeners(ctx context.Context, userID pgtype.UUID) ([]Screener, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
+	GetUserByID(ctx context.Context, id pgtype.UUID) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUsers(ctx context.Context) ([]User, error)
 	UpdateScreener(ctx context.Context, arg UpdateScreenerParams) (Screener, error)
+	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 }
 
 var _ Querier = (*Queries)(nil)

@@ -7,29 +7,31 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createScreener = `-- name: CreateScreener :one
-INSERT INTO screeners (username, name, rules)
+INSERT INTO screeners (user_id, name, rules)
 VALUES ($1, $2, $3)
-RETURNING id, name, rules, username, stock_universe
+RETURNING id, name, rules, stock_universe, user_id
 `
 
 type CreateScreenerParams struct {
-	Username string `json:"username"`
-	Name     string `json:"name"`
-	Rules    []byte `json:"rules"`
+	UserID pgtype.UUID `json:"user_id"`
+	Name   string      `json:"name"`
+	Rules  []byte      `json:"rules"`
 }
 
 func (q *Queries) CreateScreener(ctx context.Context, arg CreateScreenerParams) (Screener, error) {
-	row := q.db.QueryRow(ctx, createScreener, arg.Username, arg.Name, arg.Rules)
+	row := q.db.QueryRow(ctx, createScreener, arg.UserID, arg.Name, arg.Rules)
 	var i Screener
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Rules,
-		&i.Username,
 		&i.StockUniverse,
+		&i.UserID,
 	)
 	return i, err
 }
@@ -45,7 +47,7 @@ func (q *Queries) DeleteScreener(ctx context.Context, id int32) error {
 }
 
 const getScreener = `-- name: GetScreener :one
-SELECT id, name, rules, username, stock_universe FROM screeners
+SELECT id, name, rules, stock_universe, user_id FROM screeners
 WHERE id = $1
 `
 
@@ -56,19 +58,19 @@ func (q *Queries) GetScreener(ctx context.Context, id int32) (Screener, error) {
 		&i.ID,
 		&i.Name,
 		&i.Rules,
-		&i.Username,
 		&i.StockUniverse,
+		&i.UserID,
 	)
 	return i, err
 }
 
 const getScreeners = `-- name: GetScreeners :many
-SELECT id, name, rules, username, stock_universe FROM screeners
-WHERE username = $1
+SELECT id, name, rules, stock_universe, user_id FROM screeners
+WHERE user_id = $1
 `
 
-func (q *Queries) GetScreeners(ctx context.Context, username string) ([]Screener, error) {
-	rows, err := q.db.Query(ctx, getScreeners, username)
+func (q *Queries) GetScreeners(ctx context.Context, userID pgtype.UUID) ([]Screener, error) {
+	rows, err := q.db.Query(ctx, getScreeners, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -80,8 +82,8 @@ func (q *Queries) GetScreeners(ctx context.Context, username string) ([]Screener
 			&i.ID,
 			&i.Name,
 			&i.Rules,
-			&i.Username,
 			&i.StockUniverse,
+			&i.UserID,
 		); err != nil {
 			return nil, err
 		}
@@ -97,7 +99,7 @@ const updateScreener = `-- name: UpdateScreener :one
 UPDATE screeners
 SET name = $2, rules = $3, stock_universe = $4
 WHERE id = $1
-RETURNING id, name, rules, username, stock_universe
+RETURNING id, name, rules, stock_universe, user_id
 `
 
 type UpdateScreenerParams struct {
@@ -119,8 +121,8 @@ func (q *Queries) UpdateScreener(ctx context.Context, arg UpdateScreenerParams) 
 		&i.ID,
 		&i.Name,
 		&i.Rules,
-		&i.Username,
 		&i.StockUniverse,
+		&i.UserID,
 	)
 	return i, err
 }

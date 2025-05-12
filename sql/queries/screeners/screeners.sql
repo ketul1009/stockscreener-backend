@@ -1,5 +1,5 @@
 -- name: CreateScreener :one
-INSERT INTO screeners (username, name, rules)
+INSERT INTO screeners (user_id, name, rules)
 VALUES ($1, $2, $3)
 RETURNING *;
 
@@ -9,7 +9,7 @@ WHERE id = $1;
 
 -- name: GetScreeners :many
 SELECT * FROM screeners
-WHERE username = $1;
+WHERE user_id = $1;
 
 -- name: UpdateScreener :one
 UPDATE screeners

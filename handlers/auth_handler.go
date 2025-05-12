@@ -79,3 +79,25 @@ func (h *AuthHandler) HandlerGetUserFromToken(w http.ResponseWriter, r *http.Req
 
 	respondWithJSON(w, http.StatusOK, user)
 }
+
+func (h *AuthHandler) HandlerUpdateUser(w http.ResponseWriter, r *http.Request) {
+	var updateRequest struct {
+		ID       string `json:"id"`
+		Username string `json:"username"`
+		Email    string `json:"email"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&updateRequest); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	user, err := h.AuthService.UpdateUser(r.Context(), updateRequest.ID, updateRequest.Username, updateRequest.Email)
+	if err != nil {
+		logger.Error("Failed to update user", zap.Error(err))
+		respondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, user)
+}
