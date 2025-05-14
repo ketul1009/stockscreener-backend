@@ -28,5 +28,9 @@ func InitRoutes(apiConfig handlers.ApiConfig) *chi.Mux {
 	v1Router.Put("/screeners/{id}", apiConfig.HandlerUpdateScreener)
 	v1Router.Delete("/screeners", apiConfig.HandlerDeleteScreener)
 
+	// Job Producer and Result routes
+	v1Router.Post("/jobs", apiConfig.HandlerCreateJob)
+	v1Router.Get("/jobs/result", apiConfig.HandlerGetJobResult)
+
 	return v1Router
 }

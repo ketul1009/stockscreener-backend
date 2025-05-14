@@ -10,6 +10,8 @@ import (
 	"github.com/ketul1009/stockscreener-backend/db"
 	"github.com/ketul1009/stockscreener-backend/pkg/logger"
 	"github.com/ketul1009/stockscreener-backend/service"
+	engine "github.com/ketul1009/stockscreener-backend/stock-engine"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
 
@@ -17,6 +19,7 @@ type ApiConfig struct {
 	DB              *db.Queries
 	AuthService     *service.AuthService
 	ScreenerService *service.ScreenerService
+	RedisClient     *redis.Client
 }
 
 type errorResponse struct {
@@ -147,4 +150,62 @@ func (cfg *ApiConfig) HandlerGetUserFromToken(w http.ResponseWriter, r *http.Req
 func (cfg *ApiConfig) HandlerUpdateUser(w http.ResponseWriter, r *http.Request) {
 	authHandler := AuthHandler{AuthService: cfg.AuthService}
 	authHandler.HandlerUpdateUser(w, r)
+}
+
+// Handler to produce a new screener job
+func (cfg *ApiConfig) HandlerCreateJob(w http.ResponseWriter, r *http.Request) {
+	type parameters struct {
+		Rules    map[string]interface{} `json:"rules"`
+		Username string                 `json:"username"`
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	params := parameters{}
+	if err := decoder.Decode(&params); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	jobID := uuid.New().String()
+	job := engine.ScreenerJob{
+		JobID:  jobID,
+		Rules:  params.Rules,
+		UserID: params.Username,
+	}
+	jobJSON, err := json.Marshal(job)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Failed to marshal job", http.StatusInternalServerError)
+		return
+	}
+
+	// Push job to Redis queue
+	err = cfg.RedisClient.LPush(r.Context(), "screener_jobs", jobJSON).Err()
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Failed to enqueue job", http.StatusInternalServerError)
+		return
+	}
+
+	respondWithJSON(w, http.StatusAccepted, map[string]string{"job_id": jobID})
+}
+
+// Handler to fetch job result
+func (cfg *ApiConfig) HandlerGetJobResult(w http.ResponseWriter, r *http.Request) {
+	jobID := r.URL.Query().Get("job_id")
+	if jobID == "" {
+		respondWithError(w, http.StatusBadRequest, "job_id is required", http.StatusBadRequest)
+		return
+	}
+
+	result, err := cfg.RedisClient.Get(r.Context(), "screener_result:"+jobID).Result()
+	if err == redis.Nil {
+		respondWithError(w, http.StatusNotFound, "Result not ready", http.StatusNotFound)
+		return
+	} else if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Failed to fetch result", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(result))
 }
