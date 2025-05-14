@@ -18,8 +18,10 @@ import (
 	"github.com/ketul1009/stockscreener-backend/handlers"
 	"github.com/ketul1009/stockscreener-backend/middleware"
 	"github.com/ketul1009/stockscreener-backend/pkg/logger"
+	redisconn "github.com/ketul1009/stockscreener-backend/redis"
 	"github.com/ketul1009/stockscreener-backend/routes"
 	"github.com/ketul1009/stockscreener-backend/service"
+	engine "github.com/ketul1009/stockscreener-backend/stock-engine"
 	"go.uber.org/zap"
 
 	_ "github.com/lib/pq"
@@ -80,10 +82,20 @@ func main() {
 	dbInstance := db.WithPool(pool)
 
 	// Initialize API config
+	redisClient := redisconn.NewRedisClient()
 	apiConfig := handlers.ApiConfig{
 		DB:              dbInstance,
 		AuthService:     &service.AuthService{DB: dbInstance},
 		ScreenerService: &service.ScreenerService{DB: dbInstance},
+		RedisClient:     redisClient,
+	}
+
+	// Load stocks into memory (mocked for now)
+	stocks := []engine.Stock{
+		{Symbol: "RELIANCE", PE: 24.1, Volume: 10000000, Sector: "Energy"},
+		{Symbol: "TCS", PE: 30.5, Volume: 5000000, Sector: "IT"},
+		{Symbol: "INFY", PE: 27.3, Volume: 4500000, Sector: "IT"},
+		// load your full 500 stock universe from DB or file
 	}
 
 	// Create base router
@@ -121,6 +133,8 @@ func main() {
 			logger.Fatal("Server failed to start", zap.Error(err))
 		}
 	}()
+
+	go engine.StartWorker(redisClient, stocks)
 
 	// Wait for interrupt signal to gracefully shutdown the server
 	quit := make(chan os.Signal, 1)
