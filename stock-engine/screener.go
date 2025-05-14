@@ -1,9 +1,5 @@
 package engine
 
-import (
-	"strconv"
-)
-
 func FilterStocks(stocks []Stock, rules map[string]interface{}) []string {
 	var matched []string
 
@@ -17,32 +13,26 @@ func FilterStocks(stocks []Stock, rules map[string]interface{}) []string {
 }
 
 func matchesRules(stock Stock, rules map[string]interface{}) bool {
-	for key, val := range rules {
-		switch key {
-		case "pe_lt":
-			strVal, ok := val.(string)
-			if !ok {
-				return false
-			}
-			limit, _ := strconv.ParseFloat(strVal, 64)
-			if stock.PE >= limit {
-				return false
-			}
-		case "volume_gt":
-			strVal, ok := val.(string)
-			if !ok {
-				return false
-			}
-			limit, _ := strconv.Atoi(strVal)
-			if stock.Volume <= limit {
-				return false
-			}
-		case "sector":
-			if stock.Sector != val {
-				return false
-			}
-			// add more filters as needed
-		}
+	// Get the "indicators" sub-map
+	indicatorsRaw, ok := stock.Indicators["indicators"]
+	if !ok {
+		return false
 	}
-	return true
+	indicators, ok := indicatorsRaw.(map[string]interface{})
+	if !ok {
+		return false
+	}
+
+	// Get EMA5 and EMA20 as float64
+	ema5Raw, ok1 := indicators["EMA5"]
+	ema20Raw, ok2 := indicators["EMA20"]
+	if !ok1 || !ok2 {
+		return false
+	}
+	ema5, ok1 := ema5Raw.(float64)
+	ema20, ok2 := ema20Raw.(float64)
+	if ok1 && ok2 && ema5 > ema20 {
+		return true
+	}
+	return false
 }

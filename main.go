@@ -86,16 +86,8 @@ func main() {
 	apiConfig := handlers.ApiConfig{
 		DB:              dbInstance,
 		AuthService:     &service.AuthService{DB: dbInstance},
-		ScreenerService: &service.ScreenerService{DB: dbInstance},
+		ScreenerService: &service.ScreenerService{DB: dbInstance, Pool: pool},
 		RedisClient:     redisClient,
-	}
-
-	// Load stocks into memory (mocked for now)
-	stocks := []engine.Stock{
-		{Symbol: "RELIANCE", PE: 24.1, Volume: 10000000, Sector: "Energy"},
-		{Symbol: "TCS", PE: 30.5, Volume: 5000000, Sector: "IT"},
-		{Symbol: "INFY", PE: 27.3, Volume: 4500000, Sector: "IT"},
-		// load your full 500 stock universe from DB or file
 	}
 
 	// Create base router
@@ -133,6 +125,12 @@ func main() {
 			logger.Fatal("Server failed to start", zap.Error(err))
 		}
 	}()
+
+	stocks, err := apiConfig.ScreenerService.GetStockUniverse(ctx)
+	if err != nil {
+		logger.Fatal("Failed to get stock universe", zap.Error(err))
+		stocks = []engine.Stock{}
+	}
 
 	go engine.StartWorker(redisClient, stocks)
 
