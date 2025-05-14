@@ -7,11 +7,14 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/ketul1009/stockscreener-backend/db"
+	engine "github.com/ketul1009/stockscreener-backend/stock-engine"
 )
 
 type ScreenerService struct {
-	DB *db.Queries
+	DB   *db.Queries
+	Pool *pgxpool.Pool
 }
 
 type Screener struct {
@@ -133,4 +136,39 @@ func (s *ScreenerService) DeleteScreener(ctx context.Context, id int64) error {
 	}
 
 	return nil
+}
+
+func (s *ScreenerService) GetStockUniverse(ctx context.Context) ([]engine.Stock, error) {
+	query := `SELECT symbol, indicators.indicators 
+	FROM stocks s
+	JOIN (
+		SELECT indicators, stock_id
+		FROM indicators_data 
+		WHERE (
+			DATE = '2025-05-14'
+		)
+	) AS indicators ON s.id = indicators.stock_id`
+	rows, err := s.Pool.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	var stocks []engine.Stock
+	for rows.Next() {
+		var symbol string
+		var indicatorsJSON []byte
+		if err := rows.Scan(&symbol, &indicatorsJSON); err != nil {
+			return nil, err
+		}
+		var indicators map[string]interface{}
+		if err := json.Unmarshal(indicatorsJSON, &indicators); err != nil {
+			return nil, err
+		}
+		stocks = append(stocks, engine.Stock{Symbol: symbol, Indicators: indicators})
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return stocks, nil
 }

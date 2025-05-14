@@ -168,9 +168,9 @@ func (cfg *ApiConfig) HandlerCreateJob(w http.ResponseWriter, r *http.Request) {
 
 	jobID := uuid.New().String()
 	job := engine.ScreenerJob{
-		JobID:  jobID,
-		Rules:  params.Rules,
-		UserID: params.Username,
+		JobID:    jobID,
+		Rules:    params.Rules,
+		Username: params.Username,
 	}
 	jobJSON, err := json.Marshal(job)
 	if err != nil {

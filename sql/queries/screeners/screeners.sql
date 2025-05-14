@@ -21,3 +21,5 @@ RETURNING *;
 DELETE FROM screeners
 WHERE id = $1;
 
+-- name: GetStockUniverse :many
+SELECT * FROM stocks;
