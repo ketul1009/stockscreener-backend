@@ -155,8 +155,8 @@ func (cfg *ApiConfig) HandlerUpdateUser(w http.ResponseWriter, r *http.Request) 
 // Handler to produce a new screener job
 func (cfg *ApiConfig) HandlerCreateJob(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Rules    map[string]interface{} `json:"rules"`
-		Username string                 `json:"username"`
+		Rules    []engine.Rule `json:"rules"`
+		Username string        `json:"username"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
