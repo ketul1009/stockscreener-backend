@@ -118,3 +118,19 @@ func (h *ScreenerHandler) DeleteScreener(w http.ResponseWriter, r *http.Request)
 
 	respondWithJSON(w, http.StatusOK, map[string]string{"message": "Screener deleted successfully"})
 }
+
+func (h *ScreenerHandler) GetJobId(w http.ResponseWriter, r *http.Request) {
+	userID := r.URL.Query().Get("user_id")
+	if userID == "" {
+		respondWithError(w, http.StatusBadRequest, "User ID is required", 400)
+		return
+	}
+
+	jobID, err := h.ScreenerService.GetJobId(r.Context(), userID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Failed to get job ID", 500)
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"job_id": jobID})
+}
