@@ -155,8 +155,8 @@ func (cfg *ApiConfig) HandlerUpdateUser(w http.ResponseWriter, r *http.Request) 
 // Handler to produce a new screener job
 func (cfg *ApiConfig) HandlerCreateJob(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Rules    []engine.Rule `json:"rules"`
-		Username string        `json:"username"`
+		Rules  []engine.Rule `json:"rules"`
+		UserID string        `json:"user_id"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -166,11 +166,51 @@ func (cfg *ApiConfig) HandlerCreateJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if params.UserID == "" {
+		respondWithError(w, http.StatusBadRequest, "User ID is required", http.StatusBadRequest)
+		return
+	}
+
 	jobID := uuid.New().String()
+	jobTracker, err := cfg.DB.GetJobTrackerByUserID(r.Context(), pgtype.UUID{Bytes: uuid.MustParse(params.UserID), Valid: true})
+
+	if err != nil && err.Error() != "sql: no rows in result set" {
+		jobTracker, err = cfg.DB.CreateJobTracker(r.Context(), db.CreateJobTrackerParams{
+			JobID:        pgtype.UUID{Bytes: uuid.MustParse(jobID), Valid: true},
+			UserID:       pgtype.UUID{Bytes: uuid.MustParse(params.UserID), Valid: true},
+			JobStatus:    "pending",
+			JobCreatedAt: pgtype.Timestamp{Time: time.Now(), Valid: true},
+			JobUpdatedAt: pgtype.Timestamp{Time: time.Now(), Valid: true},
+		})
+
+		if err != nil {
+			logger.Error("Failed to create job tracker", zap.Error(err))
+			respondWithError(w, http.StatusInternalServerError, "Failed to create job tracker", http.StatusInternalServerError)
+			return
+		}
+	} else if jobTracker.JobStatus == "running" || jobTracker.JobStatus == "pending" {
+		respondWithError(w, http.StatusBadRequest, "User already has a running or pending job", http.StatusBadRequest)
+		return
+	}
+
+	jobTracker, err = cfg.DB.UpdateJobTrackerForNewJob(r.Context(), db.UpdateJobTrackerForNewJobParams{
+		JobID:        pgtype.UUID{Bytes: uuid.MustParse(jobID), Valid: true},
+		UserID:       pgtype.UUID{Bytes: uuid.MustParse(params.UserID), Valid: true},
+		JobStatus:    "pending",
+		JobCreatedAt: pgtype.Timestamp{Time: time.Now(), Valid: true},
+		JobUpdatedAt: pgtype.Timestamp{Time: time.Now(), Valid: true},
+	})
+
+	if err != nil {
+		logger.Error("Failed to update job tracker", zap.Error(err))
+		respondWithError(w, http.StatusInternalServerError, "Failed to update job tracker [Error: UpdateJobTrackerForNewJob]", http.StatusInternalServerError)
+		return
+	}
+
 	job := engine.ScreenerJob{
-		JobID:    jobID,
-		Rules:    params.Rules,
-		Username: params.Username,
+		JobID:  jobID,
+		Rules:  params.Rules,
+		UserID: params.UserID,
 	}
 	jobJSON, err := json.Marshal(job)
 	if err != nil {
@@ -196,12 +236,24 @@ func (cfg *ApiConfig) HandlerGetJobResult(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	jobTracker, err := cfg.DB.GetJobTrackerByJobID(r.Context(), pgtype.UUID{Bytes: uuid.MustParse(jobID), Valid: true})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Failed to get job tracker", http.StatusInternalServerError)
+		return
+	}
+
+	if jobTracker.JobStatus == "pending" || jobTracker.JobStatus == "running" {
+		respondWithError(w, http.StatusAccepted, "Job is still pending", http.StatusAccepted)
+		return
+	}
+
 	result, err := cfg.RedisClient.Get(r.Context(), "screener_result:"+jobID).Result()
 	if err == redis.Nil {
 		respondWithError(w, http.StatusNotFound, "Result not ready", http.StatusNotFound)
 		return
 	} else if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Failed to fetch result", http.StatusInternalServerError)
+		logger.Error("Failed to fetch result", zap.Error(err))
 		return
 	}
 
