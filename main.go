@@ -84,10 +84,11 @@ func main() {
 	// Initialize API config
 	redisClient := redisconn.NewRedisClient()
 	apiConfig := handlers.ApiConfig{
-		DB:              dbInstance,
-		AuthService:     &service.AuthService{DB: dbInstance},
-		ScreenerService: &service.ScreenerService{DB: dbInstance, Pool: pool},
-		RedisClient:     redisClient,
+		DB:               dbInstance,
+		AuthService:      &service.AuthService{DB: dbInstance},
+		ScreenerService:  &service.ScreenerService{DB: dbInstance, Pool: pool},
+		WatchlistService: &service.WatchlistService{DB: dbInstance, Pool: pool},
+		RedisClient:      redisClient,
 	}
 
 	// Create base router
