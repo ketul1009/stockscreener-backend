@@ -31,6 +31,7 @@ func InitRoutes(apiConfig handlers.ApiConfig) *chi.Mux {
 	// Job Producer and Result routes
 	v1Router.Post("/jobs", apiConfig.HandlerCreateJob)
 	v1Router.Get("/jobs/result", apiConfig.HandlerGetJobResult)
+	v1Router.Get("/jobs", apiConfig.HandlerGetJobId)
 
 	return v1Router
 }

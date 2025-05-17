@@ -261,3 +261,8 @@ func (cfg *ApiConfig) HandlerGetJobResult(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(result))
 }
+
+func (cfg *ApiConfig) HandlerGetJobId(w http.ResponseWriter, r *http.Request) {
+	screenerHandler := ScreenerHandler{ScreenerService: cfg.ScreenerService}
+	screenerHandler.GetJobId(w, r)
+}
