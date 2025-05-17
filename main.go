@@ -132,7 +132,7 @@ func main() {
 		stocks = []engine.Stock{}
 	}
 
-	go engine.StartWorker(redisClient, stocks)
+	go engine.StartWorker(redisClient, stocks, &engine.ApiConfig{DB: dbInstance})
 
 	// Wait for interrupt signal to gracefully shutdown the server
 	quit := make(chan os.Signal, 1)

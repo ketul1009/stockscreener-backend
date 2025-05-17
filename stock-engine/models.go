@@ -9,9 +9,9 @@ type Rule struct {
 }
 
 type ScreenerJob struct {
-	JobID    string `json:"job_id"`
-	Rules    []Rule `json:"rules"`
-	Username string `json:"username"`
+	JobID  string `json:"job_id"`
+	Rules  []Rule `json:"rules"`
+	UserID string `json:"user_id"`
 }
 
 type Stock struct {

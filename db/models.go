@@ -8,6 +8,15 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type JobTracker struct {
+	ID           int32            `json:"id"`
+	JobID        pgtype.UUID      `json:"job_id"`
+	UserID       pgtype.UUID      `json:"user_id"`
+	JobStatus    string           `json:"job_status"`
+	JobCreatedAt pgtype.Timestamp `json:"job_created_at"`
+	JobUpdatedAt pgtype.Timestamp `json:"job_updated_at"`
+}
+
 type Screener struct {
 	ID            int32       `json:"id"`
 	Name          string      `json:"name"`

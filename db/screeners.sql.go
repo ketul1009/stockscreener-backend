@@ -11,6 +11,40 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const createJobTracker = `-- name: CreateJobTracker :one
+INSERT INTO job_tracker (job_id, user_id, job_status, job_created_at, job_updated_at)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, job_id, user_id, job_status, job_created_at, job_updated_at
+`
+
+type CreateJobTrackerParams struct {
+	JobID        pgtype.UUID      `json:"job_id"`
+	UserID       pgtype.UUID      `json:"user_id"`
+	JobStatus    string           `json:"job_status"`
+	JobCreatedAt pgtype.Timestamp `json:"job_created_at"`
+	JobUpdatedAt pgtype.Timestamp `json:"job_updated_at"`
+}
+
+func (q *Queries) CreateJobTracker(ctx context.Context, arg CreateJobTrackerParams) (JobTracker, error) {
+	row := q.db.QueryRow(ctx, createJobTracker,
+		arg.JobID,
+		arg.UserID,
+		arg.JobStatus,
+		arg.JobCreatedAt,
+		arg.JobUpdatedAt,
+	)
+	var i JobTracker
+	err := row.Scan(
+		&i.ID,
+		&i.JobID,
+		&i.UserID,
+		&i.JobStatus,
+		&i.JobCreatedAt,
+		&i.JobUpdatedAt,
+	)
+	return i, err
+}
+
 const createScreener = `-- name: CreateScreener :one
 INSERT INTO screeners (user_id, name, rules)
 VALUES ($1, $2, $3)
@@ -44,6 +78,44 @@ WHERE id = $1
 func (q *Queries) DeleteScreener(ctx context.Context, id int32) error {
 	_, err := q.db.Exec(ctx, deleteScreener, id)
 	return err
+}
+
+const getJobTrackerByJobID = `-- name: GetJobTrackerByJobID :one
+SELECT id, job_id, user_id, job_status, job_created_at, job_updated_at FROM job_tracker
+WHERE job_id = $1
+`
+
+func (q *Queries) GetJobTrackerByJobID(ctx context.Context, jobID pgtype.UUID) (JobTracker, error) {
+	row := q.db.QueryRow(ctx, getJobTrackerByJobID, jobID)
+	var i JobTracker
+	err := row.Scan(
+		&i.ID,
+		&i.JobID,
+		&i.UserID,
+		&i.JobStatus,
+		&i.JobCreatedAt,
+		&i.JobUpdatedAt,
+	)
+	return i, err
+}
+
+const getJobTrackerByUserID = `-- name: GetJobTrackerByUserID :one
+SELECT id, job_id, user_id, job_status, job_created_at, job_updated_at FROM job_tracker
+WHERE user_id = $1
+`
+
+func (q *Queries) GetJobTrackerByUserID(ctx context.Context, userID pgtype.UUID) (JobTracker, error) {
+	row := q.db.QueryRow(ctx, getJobTrackerByUserID, userID)
+	var i JobTracker
+	err := row.Scan(
+		&i.ID,
+		&i.JobID,
+		&i.UserID,
+		&i.JobStatus,
+		&i.JobCreatedAt,
+		&i.JobUpdatedAt,
+	)
+	return i, err
 }
 
 const getScreener = `-- name: GetScreener :one
@@ -93,6 +165,68 @@ func (q *Queries) GetScreeners(ctx context.Context, userID pgtype.UUID) ([]Scree
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateJobTrackerForExistingJob = `-- name: UpdateJobTrackerForExistingJob :one
+UPDATE job_tracker
+SET job_status = $2, job_updated_at = $3
+WHERE job_id = $1
+RETURNING id, job_id, user_id, job_status, job_created_at, job_updated_at
+`
+
+type UpdateJobTrackerForExistingJobParams struct {
+	JobID        pgtype.UUID      `json:"job_id"`
+	JobStatus    string           `json:"job_status"`
+	JobUpdatedAt pgtype.Timestamp `json:"job_updated_at"`
+}
+
+func (q *Queries) UpdateJobTrackerForExistingJob(ctx context.Context, arg UpdateJobTrackerForExistingJobParams) (JobTracker, error) {
+	row := q.db.QueryRow(ctx, updateJobTrackerForExistingJob, arg.JobID, arg.JobStatus, arg.JobUpdatedAt)
+	var i JobTracker
+	err := row.Scan(
+		&i.ID,
+		&i.JobID,
+		&i.UserID,
+		&i.JobStatus,
+		&i.JobCreatedAt,
+		&i.JobUpdatedAt,
+	)
+	return i, err
+}
+
+const updateJobTrackerForNewJob = `-- name: UpdateJobTrackerForNewJob :one
+UPDATE job_tracker
+SET job_id = $2, job_status = $3, job_created_at = $4, job_updated_at = $5
+WHERE user_id = $1
+RETURNING id, job_id, user_id, job_status, job_created_at, job_updated_at
+`
+
+type UpdateJobTrackerForNewJobParams struct {
+	UserID       pgtype.UUID      `json:"user_id"`
+	JobID        pgtype.UUID      `json:"job_id"`
+	JobStatus    string           `json:"job_status"`
+	JobCreatedAt pgtype.Timestamp `json:"job_created_at"`
+	JobUpdatedAt pgtype.Timestamp `json:"job_updated_at"`
+}
+
+func (q *Queries) UpdateJobTrackerForNewJob(ctx context.Context, arg UpdateJobTrackerForNewJobParams) (JobTracker, error) {
+	row := q.db.QueryRow(ctx, updateJobTrackerForNewJob,
+		arg.UserID,
+		arg.JobID,
+		arg.JobStatus,
+		arg.JobCreatedAt,
+		arg.JobUpdatedAt,
+	)
+	var i JobTracker
+	err := row.Scan(
+		&i.ID,
+		&i.JobID,
+		&i.UserID,
+		&i.JobStatus,
+		&i.JobCreatedAt,
+		&i.JobUpdatedAt,
+	)
+	return i, err
 }
 
 const updateScreener = `-- name: UpdateScreener :one

@@ -12,7 +12,6 @@ func FilterStocks(stocks []Stock, rules []Rule) []string {
 			matched = append(matched, stock.Symbol)
 		}
 	}
-
 	return matched
 }
 
