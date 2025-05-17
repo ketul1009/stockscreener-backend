@@ -33,5 +33,12 @@ func InitRoutes(apiConfig handlers.ApiConfig) *chi.Mux {
 	v1Router.Get("/jobs/result", apiConfig.HandlerGetJobResult)
 	v1Router.Get("/jobs", apiConfig.HandlerGetJobId)
 
+	// Watchlist routes
+	v1Router.Post("/watchlists", apiConfig.HandlerCreateWatchlist)
+	v1Router.Get("/watchlists", apiConfig.HandlerGetWatchlist)
+	v1Router.Get("/watchlists/all", apiConfig.HandlerGetAllWatchlists)
+	v1Router.Put("/watchlists/{id}", apiConfig.HandlerUpdateWatchlist)
+	v1Router.Delete("/watchlists/{id}", apiConfig.HandlerDeleteWatchlist)
+
 	return v1Router
 }

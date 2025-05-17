@@ -14,7 +14,10 @@ type Querier interface {
 	CreateJobTracker(ctx context.Context, arg CreateJobTrackerParams) (JobTracker, error)
 	CreateScreener(ctx context.Context, arg CreateScreenerParams) (Screener, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	CreateWatchlist(ctx context.Context, arg CreateWatchlistParams) (Watchlist, error)
 	DeleteScreener(ctx context.Context, id int32) error
+	DeleteWatchlist(ctx context.Context, id int32) error
+	GetAllWatchlists(ctx context.Context, userID pgtype.UUID) ([]Watchlist, error)
 	GetJobTrackerByJobID(ctx context.Context, jobID pgtype.UUID) (JobTracker, error)
 	GetJobTrackerByUserID(ctx context.Context, userID pgtype.UUID) (JobTracker, error)
 	GetScreener(ctx context.Context, id int32) (Screener, error)
@@ -23,10 +26,12 @@ type Querier interface {
 	GetUserByID(ctx context.Context, id pgtype.UUID) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUsers(ctx context.Context) ([]User, error)
+	GetWatchlist(ctx context.Context, id int32) (Watchlist, error)
 	UpdateJobTrackerForExistingJob(ctx context.Context, arg UpdateJobTrackerForExistingJobParams) (JobTracker, error)
 	UpdateJobTrackerForNewJob(ctx context.Context, arg UpdateJobTrackerForNewJobParams) (JobTracker, error)
 	UpdateScreener(ctx context.Context, arg UpdateScreenerParams) (Screener, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
+	UpdateWatchlist(ctx context.Context, arg UpdateWatchlistParams) (Watchlist, error)
 }
 
 var _ Querier = (*Queries)(nil)

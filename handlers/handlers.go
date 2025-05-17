@@ -16,10 +16,11 @@ import (
 )
 
 type ApiConfig struct {
-	DB              *db.Queries
-	AuthService     *service.AuthService
-	ScreenerService *service.ScreenerService
-	RedisClient     *redis.Client
+	DB               *db.Queries
+	AuthService      *service.AuthService
+	ScreenerService  *service.ScreenerService
+	WatchlistService *service.WatchlistService
+	RedisClient      *redis.Client
 }
 
 type errorResponse struct {
@@ -263,4 +264,29 @@ func (cfg *ApiConfig) HandlerGetJobResult(w http.ResponseWriter, r *http.Request
 func (cfg *ApiConfig) HandlerGetJobId(w http.ResponseWriter, r *http.Request) {
 	screenerHandler := ScreenerHandler{ScreenerService: cfg.ScreenerService}
 	screenerHandler.GetJobId(w, r)
+}
+
+func (cfg *ApiConfig) HandlerCreateWatchlist(w http.ResponseWriter, r *http.Request) {
+	watchlistHandler := WatchlistHandler{WatchlistService: cfg.WatchlistService}
+	watchlistHandler.CreateWatchlist(w, r)
+}
+
+func (cfg *ApiConfig) HandlerGetWatchlist(w http.ResponseWriter, r *http.Request) {
+	watchlistHandler := WatchlistHandler{WatchlistService: cfg.WatchlistService}
+	watchlistHandler.GetWatchlist(w, r)
+}
+
+func (cfg *ApiConfig) HandlerGetAllWatchlists(w http.ResponseWriter, r *http.Request) {
+	watchlistHandler := WatchlistHandler{WatchlistService: cfg.WatchlistService}
+	watchlistHandler.GetAllWatchlists(w, r)
+}
+
+func (cfg *ApiConfig) HandlerUpdateWatchlist(w http.ResponseWriter, r *http.Request) {
+	watchlistHandler := WatchlistHandler{WatchlistService: cfg.WatchlistService}
+	watchlistHandler.UpdateWatchlist(w, r)
+}
+
+func (cfg *ApiConfig) HandlerDeleteWatchlist(w http.ResponseWriter, r *http.Request) {
+	watchlistHandler := WatchlistHandler{WatchlistService: cfg.WatchlistService}
+	watchlistHandler.DeleteWatchlist(w, r)
 }

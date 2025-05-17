@@ -33,3 +33,12 @@ type User struct {
 	Email        string           `json:"email"`
 	PasswordHash string           `json:"password_hash"`
 }
+
+type Watchlist struct {
+	ID        int32            `json:"id"`
+	Name      string           `json:"name"`
+	UserID    pgtype.UUID      `json:"user_id"`
+	Stocks    []byte           `json:"stocks"`
+	CreatedAt pgtype.Timestamp `json:"created_at"`
+	UpdatedAt pgtype.Timestamp `json:"updated_at"`
+}
