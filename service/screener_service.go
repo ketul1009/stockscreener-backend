@@ -173,10 +173,10 @@ func (s *ScreenerService) GetStockUniverse(ctx context.Context) ([]engine.Stock,
 	return stocks, nil
 }
 
-func (s *ScreenerService) GetJobId(ctx context.Context, userID string) (string, error) {
+func (s *ScreenerService) GetJobId(ctx context.Context, userID string) (db.JobTracker, error) {
 	jobTracker, err := s.DB.GetJobTrackerByUserID(ctx, pgtype.UUID{Bytes: uuid.MustParse(userID), Valid: true})
 	if err != nil {
-		return "", err
+		return db.JobTracker{}, err
 	}
-	return jobTracker.JobID.String(), nil
+	return jobTracker, nil
 }
