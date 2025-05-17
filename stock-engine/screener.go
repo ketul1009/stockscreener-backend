@@ -4,12 +4,26 @@ import (
 	"strconv"
 )
 
-func FilterStocks(stocks []Stock, rules []Rule) []string {
-	var matched []string
+func FilterStocks(stocks []Stock, rules []Rule) []map[string]interface{} {
+	var matched []map[string]interface{}
 
 	for _, stock := range stocks {
 		if matchesRules(stock, rules) {
-			matched = append(matched, stock.Symbol)
+			indicatorsRaw, ok := stock.Indicators["indicators"]
+			if !ok {
+				continue
+			}
+			indicators, ok := indicatorsRaw.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			stockMap := map[string]interface{}{
+				"symbol": stock.Symbol,
+				"close":  indicators["close"],
+				"volume": indicators["volume"],
+				"change": indicators["change"],
+			}
+			matched = append(matched, stockMap)
 		}
 	}
 	return matched

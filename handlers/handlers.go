@@ -257,9 +257,7 @@ func (cfg *ApiConfig) HandlerGetJobResult(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(result))
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": result, "job_id": jobTracker.JobID.String(), "job_status": jobTracker.JobStatus})
 }
 
 func (cfg *ApiConfig) HandlerGetJobId(w http.ResponseWriter, r *http.Request) {

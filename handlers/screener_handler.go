@@ -126,11 +126,11 @@ func (h *ScreenerHandler) GetJobId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jobID, err := h.ScreenerService.GetJobId(r.Context(), userID)
+	jobTracker, err := h.ScreenerService.GetJobId(r.Context(), userID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Failed to get job ID", 500)
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, map[string]string{"job_id": jobID})
+	respondWithJSON(w, http.StatusOK, jobTracker)
 }
