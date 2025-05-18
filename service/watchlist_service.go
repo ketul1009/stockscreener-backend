@@ -11,6 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/ketul1009/stockscreener-backend/db"
 	"github.com/ketul1009/stockscreener-backend/pkg/logger"
+	utils "github.com/ketul1009/stockscreener-backend/utils"
 	"go.uber.org/zap"
 )
 
@@ -27,7 +28,16 @@ type Watchlist struct {
 }
 
 func (s *WatchlistService) CreateWatchlist(ctx context.Context, watchlist *Watchlist) (*Watchlist, error) {
-	stockListJSON, err := json.Marshal(watchlist.StockList)
+
+	uniqueStocks := utils.NewSet[string]()
+	stockList := []map[string]interface{}{}
+	for _, stock := range watchlist.StockList {
+		if !uniqueStocks.Has(stock["symbol"].(string)) {
+			stockList = append(stockList, stock)
+			uniqueStocks.Add(stock["symbol"].(string))
+		}
+	}
+	stockListJSON, err := json.Marshal(stockList)
 	if err != nil {
 		return nil, err
 	}
@@ -55,6 +65,7 @@ func (s *WatchlistService) CreateWatchlist(ctx context.Context, watchlist *Watch
 		StockList: watchlist.StockList,
 	}, nil
 }
+
 func (s *WatchlistService) GetWatchlist(ctx context.Context, id int32) (*Watchlist, error) {
 	watchlist, err := s.DB.GetWatchlist(ctx, id)
 	if err != nil {
@@ -100,7 +111,15 @@ func (s *WatchlistService) GetAllWatchlists(ctx context.Context, userID string) 
 }
 
 func (s *WatchlistService) UpdateWatchlist(ctx context.Context, id int32, watchlist *Watchlist) (*Watchlist, error) {
-	stockListJSON, err := json.Marshal(watchlist.StockList)
+	uniqueStocks := utils.NewSet[string]()
+	stockList := []map[string]interface{}{}
+	for _, stock := range watchlist.StockList {
+		if !uniqueStocks.Has(stock["symbol"].(string)) {
+			stockList = append(stockList, stock)
+			uniqueStocks.Add(stock["symbol"].(string))
+		}
+	}
+	stockListJSON, err := json.Marshal(stockList)
 	if err != nil {
 		return nil, err
 	}
