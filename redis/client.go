@@ -1,20 +1,25 @@
 package redisconn
 
 import (
+	"log"
 	"os"
 
 	"github.com/redis/go-redis/v9"
 )
 
 func NewRedisClient() *redis.Client {
-	var redisURL string
 	if os.Getenv("ENV") == "production" {
-		redisURL = os.Getenv("REDIS_URL")
+		redisURL := os.Getenv("REDIS_URL")
+		opt, err := redis.ParseURL(redisURL)
+		if err != nil {
+			log.Fatalf("failed to parse redis url: %v", err)
+		}
+		return redis.NewClient(opt)
 	} else {
-		redisURL = "localhost:6379"
+		// Local development
+		return redis.NewClient(&redis.Options{
+			Addr: "localhost:6379",
+			DB:   0,
+		})
 	}
-	return redis.NewClient(&redis.Options{
-		Addr: redisURL,
-		DB:   0,
-	})
 }
