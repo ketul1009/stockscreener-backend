@@ -113,13 +113,14 @@ func (q *Queries) GetWatchlist(ctx context.Context, id int32) (Watchlist, error)
 const updateWatchlist = `-- name: UpdateWatchlist :one
 
 UPDATE watchlist
-SET name = $2, stocks = $3, updated_at = $4
-WHERE id = $1
+SET name = $3, stocks = $4, updated_at = $5
+WHERE id = $1 AND user_id = $2
 RETURNING id, name, user_id, stocks, created_at, updated_at
 `
 
 type UpdateWatchlistParams struct {
 	ID        int32            `json:"id"`
+	UserID    pgtype.UUID      `json:"user_id"`
 	Name      string           `json:"name"`
 	Stocks    []byte           `json:"stocks"`
 	UpdatedAt pgtype.Timestamp `json:"updated_at"`
@@ -128,6 +129,7 @@ type UpdateWatchlistParams struct {
 func (q *Queries) UpdateWatchlist(ctx context.Context, arg UpdateWatchlistParams) (Watchlist, error) {
 	row := q.db.QueryRow(ctx, updateWatchlist,
 		arg.ID,
+		arg.UserID,
 		arg.Name,
 		arg.Stocks,
 		arg.UpdatedAt,

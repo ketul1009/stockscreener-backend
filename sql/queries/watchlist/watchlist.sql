@@ -18,8 +18,8 @@ WHERE user_id = $1;
 -- name: UpdateWatchlist :one
 
 UPDATE watchlist
-SET name = $2, stocks = $3, updated_at = $4
-WHERE id = $1
+SET name = $3, stocks = $4, updated_at = $5
+WHERE id = $1 AND user_id = $2
 RETURNING *;
 
 -- name: DeleteWatchlist :exec

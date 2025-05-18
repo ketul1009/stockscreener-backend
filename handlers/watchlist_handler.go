@@ -85,5 +85,5 @@ func (h *WatchlistHandler) DeleteWatchlist(w http.ResponseWriter, r *http.Reques
 		respondWithError(w, http.StatusInternalServerError, err.Error(), 500)
 		return
 	}
-	respondWithJSON(w, http.StatusOK, "Watchlist deleted successfully")
+	respondWithJSON(w, http.StatusOK, map[string]string{"message": "Watchlist deleted successfully"})
 }
