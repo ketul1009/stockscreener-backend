@@ -107,6 +107,7 @@ func (s *WatchlistService) UpdateWatchlist(ctx context.Context, id int32, watchl
 
 	updatedWatchlist, err := s.DB.UpdateWatchlist(ctx, db.UpdateWatchlistParams{
 		ID:        id,
+		UserID:    pgtype.UUID{Bytes: uuid.MustParse(watchlist.UserID), Valid: true},
 		Name:      watchlist.Name,
 		Stocks:    stockListJSON,
 		UpdatedAt: pgtype.Timestamp{Time: time.Now(), Valid: true},

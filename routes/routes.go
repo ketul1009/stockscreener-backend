@@ -37,8 +37,8 @@ func InitRoutes(apiConfig handlers.ApiConfig) *chi.Mux {
 	v1Router.Post("/watchlists", apiConfig.HandlerCreateWatchlist)
 	v1Router.Get("/watchlists", apiConfig.HandlerGetWatchlist)
 	v1Router.Get("/watchlists/all", apiConfig.HandlerGetAllWatchlists)
-	v1Router.Put("/watchlists/{id}", apiConfig.HandlerUpdateWatchlist)
-	v1Router.Delete("/watchlists/{id}", apiConfig.HandlerDeleteWatchlist)
+	v1Router.Put("/watchlists/update", apiConfig.HandlerUpdateWatchlist)
+	v1Router.Delete("/watchlists", apiConfig.HandlerDeleteWatchlist)
 
 	return v1Router
 }
