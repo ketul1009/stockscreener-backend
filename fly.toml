@@ -7,7 +7,7 @@ app = 'stockscreener-backend'
 primary_region = 'bom'
 
 ['env']
-  DB_URL='postgresql://stockscreener_db_045u_user:z2HUJlCoxUWYm8jU3PHNOIvNc6IK3kzF@dpg-d1nvsf6r433s73bdudng-a.singapore-postgres.render.com/stockscreener_db_045u'
+  DB_URL='DATABASE_URL=postgres://ketul:Vvm@2020@stockscreener-db.internal:5432/mydb?sslmode=disable'
   ENV='production'
   JWT_SECRET='azbycxdw1928374655'
   PORT='10001'
