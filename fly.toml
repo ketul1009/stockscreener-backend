@@ -1,0 +1,25 @@
+# fly.toml app configuration file generated for stockscreener-backend on 2025-07-10T23:14:23+05:30
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'stockscreener-backend'
+primary_region = 'bom'
+
+['env']
+  DB_URL='postgresql://stockscreener_db_045u_user:z2HUJlCoxUWYm8jU3PHNOIvNc6IK3kzF@dpg-d1nvsf6r433s73bdudng-a.singapore-postgres.render.com/stockscreener_db_045u'
+
+[build]
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
