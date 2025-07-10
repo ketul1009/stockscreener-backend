@@ -7,11 +7,8 @@ app = 'stockscreener-backend'
 primary_region = 'bom'
 
 ['env']
-  DB_URL='postgresql://postgres:Vvm@2020@db.iiurjfddfngvvhumlenw.supabase.co:5432/postgres'
   ENV='production'
-  JWT_SECRET='azbycxdw1928374655'
-  PORT='10001'
-  REDIS_URL='rediss://default:AXCmAAIjcDFmYjJkNDU4MDdiZmI0MTk0OTk4N2MxZTMyMjI4ZDhhYXAxMA@amazing-moth-28838.upstash.io:6379'
+  PORT='8080'
   ALLOWED_ORIGINS='https://stockscreener-frontend.vercel.app/'
 
 [build]
