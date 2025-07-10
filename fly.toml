@@ -8,6 +8,11 @@ primary_region = 'bom'
 
 ['env']
   DB_URL='postgresql://stockscreener_db_045u_user:z2HUJlCoxUWYm8jU3PHNOIvNc6IK3kzF@dpg-d1nvsf6r433s73bdudng-a.singapore-postgres.render.com/stockscreener_db_045u'
+  ENV='production'
+  JWT_SECRET='azbycxdw1928374655'
+  PORT='10001'
+  REDIS_URL='rediss://default:AXCmAAIjcDFmYjJkNDU4MDdiZmI0MTk0OTk4N2MxZTMyMjI4ZDhhYXAxMA@amazing-moth-28838.upstash.io:6379'
+  ALLOWED_ORIGINS='https://stockscreener-frontend.vercel.app/'
 
 [build]
 
