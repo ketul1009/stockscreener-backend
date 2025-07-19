@@ -55,8 +55,19 @@ func (s *ScreenerService) CreateScreener(ctx context.Context, screener *Screener
 }
 
 func (s *ScreenerService) GetScreeners(ctx context.Context, username string) ([]Screener, error) {
-	screeners, err := s.DB.GetScreeners(ctx, pgtype.UUID{Bytes: uuid.MustParse(username), Valid: true})
+	// First, get the user by username to retrieve the user_id
+	fmt.Printf("Looking for user with username: %s\n", username)
+	user, err := s.DB.GetUserByUsername(ctx, username)
 	if err != nil {
+		fmt.Printf("Error getting user by username '%s': %v\n", username, err)
+		return nil, err
+	}
+
+	// Now get screeners using the user_id
+	fmt.Printf("Found user with ID: %s, getting screeners...\n", user.ID.String())
+	screeners, err := s.DB.GetScreeners(ctx, user.ID)
+	if err != nil {
+		fmt.Printf("Error getting screeners for user ID '%s': %v\n", user.ID.String(), err)
 		return nil, err
 	}
 
