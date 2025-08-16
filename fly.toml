@@ -9,7 +9,7 @@ primary_region = 'bom'
 ['env']
   ENV='production'
   PORT='8080'
-  ALLOWED_ORIGINS='https://stockscreener-frontend.vercel.app/'
+  ALLOWED_ORIGINS='https://stockscreener-frontend.vercel.app'
 
 [build]
 

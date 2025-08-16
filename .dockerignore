@@ -1,109 +1,109 @@
 # flyctl launch added from .gitignore
-**\stockscreener-backend.exe
-**\.env
-**\vendor
-**\sqlc.zip
+**/stockscreener-backend.exe
+**/.env
+**/vendor
+**/sqlc.zip
 
-# flyctl launch added from vendor\github.com\go-chi\chi\v5\.gitignore
-vendor\github.com\go-chi\chi\v5\**\.idea
-vendor\github.com\go-chi\chi\v5\**\*.sw?
-vendor\github.com\go-chi\chi\v5\**\.vscode
+# flyctl launch added from vendor/github.com/go-chi/chi/v5/.gitignore
+vendor/github.com/go-chi/chi/v5/**/.idea
+vendor/github.com/go-chi/chi/v5/**/*.sw?
+vendor/github.com/go-chi/chi/v5/**/.vscode
 
-# flyctl launch added from vendor\github.com\golang-jwt\jwt\v5\.gitignore
-vendor\github.com\golang-jwt\jwt\v5\**\.DS_Store
-vendor\github.com\golang-jwt\jwt\v5\**\bin
-vendor\github.com\golang-jwt\jwt\v5\**\.idea
+# flyctl launch added from vendor/github.com/golang-jwt/jwt/v5/.gitignore
+vendor/github.com/golang-jwt/jwt/v5/**/.DS_Store
+vendor/github.com/golang-jwt/jwt/v5/**/bin
+vendor/github.com/golang-jwt/jwt/v5/**/.idea
 
 
-# flyctl launch added from vendor\github.com\jackc\pgx\v5\.gitignore
+# flyctl launch added from vendor/github.com/jackc/pgx/v5/.gitignore
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
-vendor\github.com\jackc\pgx\v5\**\*.o
-vendor\github.com\jackc\pgx\v5\**\*.a
-vendor\github.com\jackc\pgx\v5\**\*.so
+vendor/github.com/jackc/pgx/v5/**/*.o
+vendor/github.com/jackc/pgx/v5/**/*.a
+vendor/github.com/jackc/pgx/v5/**/*.so
 
 # Folders
-vendor\github.com\jackc\pgx\v5\**\_obj
-vendor\github.com\jackc\pgx\v5\**\_test
+vendor/github.com/jackc/pgx/v5/**/_obj
+vendor/github.com/jackc/pgx/v5/**/_test
 
 # Architecture specific extensions/prefixes
-vendor\github.com\jackc\pgx\v5\**\*.[568vq]
-vendor\github.com\jackc\pgx\v5\**\[568vq].out
+vendor/github.com/jackc/pgx/v5/**/*.[568vq]
+vendor/github.com/jackc/pgx/v5/**/[568vq].out
 
-vendor\github.com\jackc\pgx\v5\**\*.cgo1.go
-vendor\github.com\jackc\pgx\v5\**\*.cgo2.c
-vendor\github.com\jackc\pgx\v5\**\_cgo_defun.c
-vendor\github.com\jackc\pgx\v5\**\_cgo_gotypes.go
-vendor\github.com\jackc\pgx\v5\**\_cgo_export.*
+vendor/github.com/jackc/pgx/v5/**/*.cgo1.go
+vendor/github.com/jackc/pgx/v5/**/*.cgo2.c
+vendor/github.com/jackc/pgx/v5/**/_cgo_defun.c
+vendor/github.com/jackc/pgx/v5/**/_cgo_gotypes.go
+vendor/github.com/jackc/pgx/v5/**/_cgo_export.*
 
-vendor\github.com\jackc\pgx\v5\**\_testmain.go
+vendor/github.com/jackc/pgx/v5/**/_testmain.go
 
-vendor\github.com\jackc\pgx\v5\**\*.exe
+vendor/github.com/jackc/pgx/v5/**/*.exe
 
-vendor\github.com\jackc\pgx\v5\**\.envrc
-vendor\github.com\jackc\pgx\v5\.testdb
+vendor/github.com/jackc/pgx/v5/**/.envrc
+vendor/github.com/jackc/pgx/v5/.testdb
 
-vendor\github.com\jackc\pgx\v5\**\.DS_Store
+vendor/github.com/jackc/pgx/v5/**/.DS_Store
 
-# flyctl launch added from vendor\github.com\joho\godotenv\.gitignore
-vendor\github.com\joho\godotenv\**\.DS_Store
+# flyctl launch added from vendor/github.com/joho/godotenv/.gitignore
+vendor/github.com/joho/godotenv/**/.DS_Store
 
-# flyctl launch added from vendor\github.com\lib\pq\.gitignore
-vendor\github.com\lib\pq\**\.db
-vendor\github.com\lib\pq\**\*.test
-vendor\github.com\lib\pq\**\*~
-vendor\github.com\lib\pq\**\*.swp
-vendor\github.com\lib\pq\**\.idea
-vendor\github.com\lib\pq\**\.vscode
+# flyctl launch added from vendor/github.com/lib/pq/.gitignore
+vendor/github.com/lib/pq/**/.db
+vendor/github.com/lib/pq/**/*.test
+vendor/github.com/lib/pq/**/*~
+vendor/github.com/lib/pq/**/*.swp
+vendor/github.com/lib/pq/**/.idea
+vendor/github.com/lib/pq/**/.vscode
 
-# flyctl launch added from vendor\github.com\redis\go-redis\v9\.gitignore
-vendor\github.com\redis\go-redis\v9\**\*.rdb
-vendor\github.com\redis\go-redis\v9\**\testdata\*
-vendor\github.com\redis\go-redis\v9\**\.idea
-vendor\github.com\redis\go-redis\v9\**\.DS_Store
-vendor\github.com\redis\go-redis\v9\**\*.tar.gz
-vendor\github.com\redis\go-redis\v9\**\*.dic
-vendor\github.com\redis\go-redis\v9\**\redis8tests.sh
-vendor\github.com\redis\go-redis\v9\**\coverage.txt
-vendor\github.com\redis\go-redis\v9\**\**\coverage.txt
-vendor\github.com\redis\go-redis\v9\**\.vscode
+# flyctl launch added from vendor/github.com/redis/go-redis/v9/.gitignore
+vendor/github.com/redis/go-redis/v9/**/*.rdb
+vendor/github.com/redis/go-redis/v9/**/testdata/*
+vendor/github.com/redis/go-redis/v9/**/.idea
+vendor/github.com/redis/go-redis/v9/**/.DS_Store
+vendor/github.com/redis/go-redis/v9/**/*.tar.gz
+vendor/github.com/redis/go-redis/v9/**/*.dic
+vendor/github.com/redis/go-redis/v9/**/redis8tests.sh
+vendor/github.com/redis/go-redis/v9/**/coverage.txt
+vendor/github.com/redis/go-redis/v9/**/*/coverage.txt
+vendor/github.com/redis/go-redis/v9/**/.vscode
 
-# flyctl launch added from vendor\go.uber.org\multierr\.gitignore
-vendor\go.uber.org\multierr\vendor
-vendor\go.uber.org\multierr\**\cover.html
-vendor\go.uber.org\multierr\**\cover.out
-vendor\go.uber.org\multierr\bin
+# flyctl launch added from vendor/go.uber.org/multierr/.gitignore
+vendor/go.uber.org/multierr/vendor
+vendor/go.uber.org/multierr/**/cover.html
+vendor/go.uber.org/multierr/**/cover.out
+vendor/go.uber.org/multierr/bin
 
-# flyctl launch added from vendor\go.uber.org\zap\.gitignore
+# flyctl launch added from vendor/go.uber.org/zap/.gitignore
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
-vendor\go.uber.org\zap\**\*.o
-vendor\go.uber.org\zap\**\*.a
-vendor\go.uber.org\zap\**\*.so
+vendor/go.uber.org/zap/**/*.o
+vendor/go.uber.org/zap/**/*.a
+vendor/go.uber.org/zap/**/*.so
 
 # Folders
-vendor\go.uber.org\zap\**\_obj
-vendor\go.uber.org\zap\**\_test
-vendor\go.uber.org\zap\**\vendor
+vendor/go.uber.org/zap/**/_obj
+vendor/go.uber.org/zap/**/_test
+vendor/go.uber.org/zap/**/vendor
 
 # Architecture specific extensions/prefixes
-vendor\go.uber.org\zap\**\*.[568vq]
-vendor\go.uber.org\zap\**\[568vq].out
+vendor/go.uber.org/zap/**/*.[568vq]
+vendor/go.uber.org/zap/**/[568vq].out
 
-vendor\go.uber.org\zap\**\*.cgo1.go
-vendor\go.uber.org\zap\**\*.cgo2.c
-vendor\go.uber.org\zap\**\_cgo_defun.c
-vendor\go.uber.org\zap\**\_cgo_gotypes.go
-vendor\go.uber.org\zap\**\_cgo_export.*
+vendor/go.uber.org/zap/**/*.cgo1.go
+vendor/go.uber.org/zap/**/*.cgo2.c
+vendor/go.uber.org/zap/**/_cgo_defun.c
+vendor/go.uber.org/zap/**/_cgo_gotypes.go
+vendor/go.uber.org/zap/**/_cgo_export.*
 
-vendor\go.uber.org\zap\**\_testmain.go
+vendor/go.uber.org/zap/**/_testmain.go
 
-vendor\go.uber.org\zap\**\*.exe
-vendor\go.uber.org\zap\**\*.test
-vendor\go.uber.org\zap\**\*.prof
-vendor\go.uber.org\zap\**\*.pprof
-vendor\go.uber.org\zap\**\*.out
-vendor\go.uber.org\zap\**\*.log
+vendor/go.uber.org/zap/**/*.exe
+vendor/go.uber.org/zap/**/*.test
+vendor/go.uber.org/zap/**/*.prof
+vendor/go.uber.org/zap/**/*.pprof
+vendor/go.uber.org/zap/**/*.out
+vendor/go.uber.org/zap/**/*.log
 
-vendor\go.uber.org\zap\bin
-vendor\go.uber.org\zap\**\cover.out
-vendor\go.uber.org\zap\**\cover.html
+vendor/go.uber.org/zap/bin
+vendor/go.uber.org/zap/**/cover.out
+vendor/go.uber.org/zap/**/cover.html
 fly.toml
