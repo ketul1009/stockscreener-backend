@@ -155,7 +155,7 @@ func (s *ScreenerService) GetStockUniverse(ctx context.Context) ([]engine.Stock,
 	JOIN (
 		SELECT indicators, stock_id
 		FROM indicators_data 
-		WHERE DATE = CURRENT_DATE
+		WHERE DATE = (SELECT MAX(DATE) FROM indicators_data)
 	) AS indicators ON s.id = indicators.stock_id`
 	rows, err := s.Pool.Query(ctx, query)
 	if err != nil {
